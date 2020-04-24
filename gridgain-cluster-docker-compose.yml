@@ -1,0 +1,95 @@
+version: '3.7'
+services:
+  gridgain-server-node-1:
+    image: gridgain/enterprise:8.7.14
+    container_name: gridgain-node-1
+    tty: true
+    environment:
+      - "JVM_OPTS=-DIGNITE_QUIET=true -Xmx1G"
+      - CONFIG_URI=/opt/gridgain/ext-config/gridgain-config.xml
+      - OPTION_LIBS=ignite-rest-http
+      - IGNITE_QUIET=false
+    networks:
+      - gridgain-net
+    ports:
+      #- "31100-31200"
+      #- "11211"
+      #- "49128"
+#      - "47501:47500"
+#      - "47101:47100"
+      - "10800:10800"
+      #- "48100-48200"
+      - "6081:8080"
+    volumes:
+      #      - gridgain-data-1:/opt/gridgain/work
+      - ./gridgain-config:/opt/gridgain/ext-config
+
+  gridgain-server-node-2:
+    image: gridgain/enterprise:8.7.14
+    container_name: gridgain-node-2
+    tty: true
+    environment:
+      - "JVM_OPTS=-DIGNITE_QUIET=true -Xmx1G"
+      - CONFIG_URI=/opt/gridgain/ext-config/gridgain-config.xml
+      - OPTION_LIBS=ignite-rest-http
+      - IGNITE_QUIET=false
+    networks:
+      - gridgain-net
+#    command: 'cp /opt/gridgain/extra-jars/* /opt/gridgain/libs/ && sleep infinity'
+    ports:
+      #- "31100-31200"
+      #- "11211"
+      #- "49128"
+      #- "47500-47600"
+      #- "47100-47200"
+      #- "48100-48200"
+#      - "47502:47500"
+#      - "47102:47100"
+      - "10801:10800"
+      - "6082:8080"
+    volumes:
+      #      - gridgain-data-2:/opt/gridgain/work
+      - ./gridgain-config:/opt/gridgain/ext-config
+
+  mysql:
+    image: my-sql-image
+    build: ./mysql
+    container_name: sql
+    ports:
+      - "3306:3306"
+    networks:
+      - gridgain-net
+    tty: true
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+
+  kafka:
+    image: gridgain-kafka-image
+    build: ./gridgain-kafka-image
+    container_name: gridgain-kafka
+    restart: always
+    tty: true
+#    volumes:
+#      - "./kafka-scripts:/scripts"
+    ports:
+      # Broker
+      - "9092:9092"
+      # ZK
+      - "2181:2181"
+      # Kafka Manager UI
+      - "3030:3030"
+      # REST API, Schema registry & Kafka- Connect Ports
+      - "8081-8083:8081-8083"
+      # JMX and other monitoring ports
+      - "9581-9585:9581-9585"
+    volumes:
+      - ./gridgain-kafka-image/conf:/conf
+    depends_on:
+      - mysql
+      - gridgain-server-node-1
+      - gridgain-server-node-2
+    networks:
+      - gridgain-net
+networks:
+  gridgain-net:
+    driver: bridge

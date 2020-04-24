@@ -1,0 +1,33 @@
+
+use mysql;
+SELECT 'Creating cdc user...' AS ' ';
+CREATE USER 'cdc_user'@'localhost' IDENTIFIED BY 'cdc_passwd';
+CREATE USER 'cdc_user'@'%' IDENTIFIED BY 'cdc_passwd';
+GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'cdc_user'@'%';
+GRANT ALL PRIVILEGES ON example.* TO 'cdc_user'@'%';
+ALTER USER 'cdc_user'@'%' IDENTIFIED WITH mysql_native_password BY 'cdc_passwd';
+FLUSH PRIVILEGES;
+
+SELECT 'Creating Example DB...' AS ' ';
+CREATE DATABASE if not exists example;
+
+SELECT 'Creating COUNTRIES table...' AS ' ';
+use example;
+CREATE TABLE IF NOT EXISTS COUNTRIES (
+  ID SMALLINT NOT NULL,
+  NAME VARCHAR(255) NOT NULL,
+  CODE  VARCHAR(10) NOT NULL,
+  PRIMARY KEY (ID)
+);
+
+SELECT 'Creating CITIES table...' AS ' ';
+CREATE TABLE IF NOT EXISTS CITIES (
+  ID INTEGER NOT NULL,
+  COUNTRY_ID SMALLINT NOT NULL,
+  LATITUDE DECIMAL(10,8) NOT NULL,
+  LONGITUDE DECIMAL(11,8) NOT NULL,
+  NAME VARCHAR(255) NOT NULL,
+  PRIMARY KEY (ID)
+);
+
+SELECT 'All DB Updates Completed!' AS ' ';
