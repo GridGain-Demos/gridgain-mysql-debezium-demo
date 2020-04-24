@@ -3,7 +3,8 @@
 
 ![image](images/kafka-connector.png)
 
-The demo shows CDC from MySql to GridGain using Debezium Connector for MySQL and GridGain Kafka Connector.
+The demo shows CDC from MySql to GridGain using Debezium Connector for MySQL and GridGain Kafka Connector. Read this 
+blog post for more details: https://www.gridgain.com/resources/blog/change-data-capture-between-mysql-and-gridgain-debezium
 
 ###
 ### Runnable scripts
